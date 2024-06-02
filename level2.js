@@ -231,7 +231,9 @@ function penetrationResponseB(b1, b2) {
     b2.pos = b2.pos.add(response.mult(-1))
 }
 
-let PB = new Ball(canvas.clientWidth/2, canvas.clientHeight/2, 30, 2, "grey", true)
+let PB = new Ball(100, 100, 30, 2, "grey", true)
+let PB2 = new Ball(canvas.clientWidth/2, canvas.clientHeight/2, 40, 4)
+let PB3 = new Ball(300, 100, 20, 1)
 
 const isHover = e => e.parentElement.querySelector(':hover') === e;
 let isHovered = false;
@@ -243,6 +245,13 @@ function mainLoop() {
         b.drawBody()
         if (b.player) {
             moveBody(b)
+        }
+
+        for(i = index+1; i<Objects.length; i++) {
+            if(detectCollisonB(b, Objects[i])) {
+                penetrationResponseB(b, Objects[i])
+                if(enableCollisions.checked) collisionResponseB(b, Objects[i])
+            }
         }
         b.calcPos()
         b.displayVectors()

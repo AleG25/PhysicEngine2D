@@ -3,10 +3,12 @@ const ctx = canvas.getContext("2d")
 
 
 let elasticity = 1
-let friction = 0.01
+let friction = 0
 let acceleration = 0.1
 
 let maxGrab = 300
+
+const gravitationalConstant = 6.6743*10**(-11)
 
 function drawLabel(text, color, p1, p2, alignment, padding ){
     if (!alignment) alignment = 'center';
@@ -53,19 +55,6 @@ function drawLabel(text, color, p1, p2, alignment, padding ){
     ctx.fillText(textToDraw,0,0);
     ctx.restore();
 }
-
-function collisionResponseB(b1, b2) {
-    const normal = b1.pos.sub(b2.pos).unit()
-    const relVel = b1.vel.sub(b2.vel)
-    const sepVel = Vector.dot(relVel, normal)
-    const nsv = -sepVel * elasticity
-    const nsvv = normal.mult(nsv)
-
-    const impulse = normal.mult((nsv - sepVel) / (b1.inv_m + b2.inv_m))
-    
-    b1.vel = b1.vel.add(impulse.mult(b1.inv_m))
-    b2.vel = b2.vel.add(impulse.mult(-b2.inv_m))
-}
 let UP, DOWN, RIGHT, LEFT;
 let x = 100
 let y = 200
@@ -108,10 +97,13 @@ class Vector {
         return new Vector(this.x/this.magnitude(), this.y/this.magnitude())
     }
 
+
     drawVector(fromx, fromy, n, color, vectorName) {
+        let lenX = this.x
+        let lenY = this.y
         var headlen = 10;
-        let tox = fromx + this.x * n;
-        let toy = fromy + this.y * n;
+        let tox = fromx + lenX * n;
+        let toy = fromy + lenY * n;
         const span = 10;
         var dx = tox - fromx;
         var dy = toy - fromy;
@@ -139,7 +131,7 @@ class Vector {
 }
 
 class Ball {
-    constructor(x, y, r, mass = 0, color = "red", player = false) {
+    constructor(x, y, r, mass = 0, planet = true, color = "red", player = false) {
         //position
         this.pos = new Vector(x, y)
         this.r = r
@@ -147,6 +139,7 @@ class Ball {
         //acceleration and velocity
         this.vel = new Vector(0, 0)
         this.acc = new Vector(0, 0)
+        this.playerAcc = new Vector(0, 0)
 
         //mass in kg
         this.mass = mass
@@ -156,6 +149,7 @@ class Ball {
         //others
         this.player = player
         this.color = color
+        this.planet = planet
         Objects.push(this)
     }
 
@@ -172,23 +166,24 @@ class Ball {
         ctx.textAlign = "center"
         ctx.textBaseline = "middle"
         ctx.font = "bold 13px Arial"
-        ctx.fillText(this.mass + " kg", this.pos.x, this.pos.y)
+
+        ctx.fillText(this.mass.toString() + " kg", this.pos.x, this.pos.y)
     }
 
     calcPos() {
         const frictionAcc = friction * 9.8 // m/s
-        this.acc = this.acc.unit().mult(acceleration)
-
         this.vel = this.vel.add(this.acc)
-        if(this.vel.magnitude() <= frictionAcc) this.vel = this.vel.sub(this.vel)
-        else this.vel = this.vel.sub(this.vel.unit().mult(frictionAcc))
-
+        this.vel = this.vel.add(this.playerAcc)
+        if(friction > 0) {
+            if(this.vel.magnitude() <= frictionAcc) this.vel = this.vel.sub(this.vel)
+            else this.vel = this.vel.sub(this.vel.unit().mult(frictionAcc))
+        }
         this.pos = this.pos.add(this.vel.mult(0.01))
     }
 
     displayVectors() {
-        if (velVec.checked) this.vel.drawVector(this.pos.x, this.pos.y, 0.2, "blue", '\u{20D7}v')
-        if (accVec.checked) this.acc.drawVector(this.pos.x, this.pos.y, 10, "green", "\u{20D7}a")
+        if (velVec.checked) this.vel.drawVector(this.pos.x, this.pos.y, 0.6, "blue", '\u{20D7}v')
+        if (accVec.checked) this.acc.drawVector(this.pos.x, this.pos.y, 15, "green", "\u{20D7}a")
         if (ffvec.checked) this.vel.unit().mult(-friction*this.mass*9.8).drawVector(this.pos.x, this.pos.y, 10, "black", "\u{20D7}F")
     }
     
@@ -209,13 +204,16 @@ canvas.addEventListener("keyup", (e) => {
 })
 
 function moveBody(b) {
-    if(UP) b.acc.y = -acceleration;
-    if(DOWN) b.acc.y = acceleration;
-    if(RIGHT) b.acc.x = acceleration;
-    if(LEFT) b.acc.x = -acceleration; 
+    if(UP) b.playerAcc.y = -acceleration;
+    if(DOWN) b.playerAcc.y = acceleration;
+    if(RIGHT) b.playerAcc.x = acceleration;
+    if(LEFT) b.playerAcc.x = -acceleration;
 
-    if(!UP && !DOWN) b.acc.y = 0
-    if(!RIGHT && !LEFT) b.acc.x = 0
+    
+
+    if(!UP && !DOWN) b.playerAcc.y = 0
+    if(!RIGHT && !LEFT) b.playerAcc.x = 0
+    b.playerAcc = b.playerAcc.unit().mult(acceleration)
 }
 
 function detectCollisonB(b1, b2) {
@@ -227,16 +225,29 @@ function penetrationResponseB(b1, b2) {
     const distance = b1.pos.sub(b2.pos)
     const depth = (b1.r + b2.r) - distance.magnitude()
     const response = distance.unit().mult(depth/2)
-    b1.pos = b1.pos.add(response)
-    b2.pos = b2.pos.add(response.mult(-1))
+
+    
+    if(!b1.planet) b1.pos = b1.pos.add(response)
+    b1.acc = new Vector(0, 0)
+    b1.vel = new Vector(0, 0)
+
+
+    if(!b2.planet) b2.pos = b2.pos.add(response.mult(-1))
+    b2.vel = new Vector(0, 0)
+    b2.acc = new Vector(0, 0)
+    
 }
 
-let PB = new Ball(canvas.clientWidth/2, canvas.clientHeight/2, 30, 2, "grey", true)
+//OBJECTS
+let PB = new Ball(20, 20, 20, 20, false, "grey", true)
+let PB2 = new Ball(canvas.clientWidth/2, canvas.clientHeight/2, 60, 5.972*(10**24))
 
 const isHover = e => e.parentElement.querySelector(':hover') === e;
 let isHovered = false;
 
 
+
+// MAIN LOOP
 function mainLoop() {
     ctx.clearRect(-maxGrab, -maxGrab, canvas.clientWidth + maxGrab*2, canvas.clientHeight + maxGrab*2)
     Objects.forEach((b, index) => {
@@ -244,6 +255,31 @@ function mainLoop() {
         if (b.player) {
             moveBody(b)
         }
+
+        let totalGravityForce = new Vector(0, 0)
+
+        for(i = 0; i<Objects.length; i++) {
+            if(i == index) continue
+            const body = Objects[i]
+            if(detectCollisonB(b, body)) {
+                penetrationResponseB(b, body)
+            }
+
+            //APPLY GRAVITY
+            const distance = b.pos.sub(body.pos)
+            const gravityForce = gravitationalConstant * b.mass * body.mass / distance.mult(10**5).magnitude()**2
+            const gravityForceVector = distance.unit().mult(-1).mult(gravityForce)
+
+            if(ffvec.checked) gravityForceVector.drawVector(b.pos.x, b.pos.y, 40/b.r, "purple", "Fa")
+            
+            
+            totalGravityForce = totalGravityForce.add(gravityForceVector)
+        }
+        
+        const accelerationGravity = totalGravityForce.unit().mult(totalGravityForce.magnitude() / b.mass)
+        
+        b.acc = accelerationGravity
+        
         b.calcPos()
         b.displayVectors()
     })
@@ -258,6 +294,9 @@ function mainLoop() {
     requestAnimationFrame(mainLoop)
 }
 requestAnimationFrame(mainLoop)
+
+//MAIN LOOP
+
 
 let grabbing = false;
 let grabEnd = {x: 0, y: 0}
@@ -336,34 +375,27 @@ const accelerationInput = document.getElementById("range-accelerazione")
 const frictionLabel = document.getElementById("friction-value")
 const accelerationLabel = document.getElementById("acceleration-value")
 
-function updateFriction() {
-    frictionLabel.innerText = normalizeValue(friction, 2)
-    frictionInput.value = friction
-}
+
 function updateAcceleration() {
     accelerationInput.value = acceleration
     accelerationLabel.innerText = normalizeValue(acceleration,2)
 }
 
 updateAcceleration()
-updateFriction()
 
-frictionInput.addEventListener("input", (e) => {
-    friction = e.target.value
-    updateFriction()
-})
+
 accelerationInput.addEventListener("input", (e) => {
     acceleration = e.target.value
     updateAcceleration()
 })
 
 document.getElementById("btn-reset-opt").onclick = () => {
-    friction = 0.01
+    
     acceleration = 0.1
     updateAcceleration()
-    updateFriction()
+    
 
-    enableCollisions.checked = true
+    
     velVec.checked = false
     ffvec.checked = false
     accVec.checked = false

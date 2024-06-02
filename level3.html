@@ -8,6 +8,11 @@
     <link rel="stylesheet" href="./main.css">
     <link rel="stylesheet" href="./navigator.css">
 </head>
+<style>
+    #display {
+        background: linear-gradient(rgba(0, 19, 24, 0.9), rgba(0, 19, 24, 0.9)), url("./repeated-square.png");
+    }
+</style>
 <body>
 
 <div class="navigator-btn navigator-btn-icon" id="nav-btn">
@@ -44,11 +49,6 @@
                 <h1 class="custom-head">Options</h1>
                 <div class="row">
                     <div class="col">
-                        <label for="range-attrito" class="form-label">Friction</label>
-                        <input type="range" class="form-range" id="range-attrito" min="0" max="1" step="0.01">
-                        <h3><span class="--math">&#956;</span> = <span id="friction-value">0</span></h3>
-                    </div>
-                    <div class="col">
                         <label for="range-accelerazione" class="form-label">Applied Acceleration</label>
                         <input type="range" class="form-range" id="range-accelerazione" min="0" max="10" step="0.01">
                         <h3><span class="specialLetter --math">a</span> = <span id="acceleration-value">0</span></h3>
@@ -56,20 +56,20 @@
                 </div>
                 <div class="row">
                     <div class="form-check form-switch text-start checkbox--custom">
-                        <input class="form-check-input" type="checkbox" role="switch" id="avector">
+                        <input class="form-check-input" type="checkbox" role="switch" id="avector" checked>
                         <label class="form-check-label" for="avector">Show Acceleration Vector</label>
                       </div>
                 </div>
                 <div class="row">
                     <div class="form-check form-switch text-start checkbox--custom">
-                        <input class="form-check-input" type="checkbox" role="switch" id="vvector">
+                        <input class="form-check-input" type="checkbox" role="switch" id="vvector" checked>
                         <label class="form-check-label" for="vvector">Show Velocity Vector</label>
                       </div>
                 </div>
                 <div class="row">
                     <div class="form-check form-switch text-start checkbox--custom">
-                        <input class="form-check-input" type="checkbox" role="switch" id="ffvector">
-                        <label class="form-check-label" for="ffvector">Show Friction Force Vector</label>
+                        <input class="form-check-input" type="checkbox" role="switch" id="ffvector" checked>
+                        <label class="form-check-label" for="ffvector">Show Gravity Force Vector</label>
                       </div>
                 </div>
                 <div class="row align-item-center">
@@ -88,7 +88,7 @@
 
 
 
-<script src="./level1.js" ></script>
+<script src="./level3.js" ></script>
 <script src="./navigator.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 <script src="https://kit.fontawesome.com/d9ada18a3f.js" crossorigin="anonymous"></script>

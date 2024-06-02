@@ -38,8 +38,20 @@ const levels = [
     {
         thumbnail: "thumbnails/level1.png",
         name: "Simple Collision",
-        link: "main.html",
+        link: "level2.html",
         level: 2
+    },
+    {
+        thumbnail: "thumbnails/level1.png",
+        name: "Gravity",
+        link: "level3.html",
+        level: 3
+    },
+    {
+        thumbnail: "thumbnails/level1.png",
+        name: "Orbit",
+        link: "level4.html",
+        level: 4
     }
 ]
 
