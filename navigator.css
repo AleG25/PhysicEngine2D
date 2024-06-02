@@ -1,0 +1,114 @@
+body {
+    overflow: hidden;
+}
+
+.navigator-btn {
+    position: absolute;
+    width: 3rem;
+    height: 3rem;
+    background-color: transparent;
+    right: 0.5rem;
+    top: 0.5rem;
+    overflow: hidden;
+
+    border-radius: 100%;
+    z-index: 11;
+}
+
+.navigator-btn-inside {
+    width: 100%;
+    height: 100%;
+    background-color: var(--bs-info);
+    z-index: 0;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color;
+    transition-duration: 0.2s;
+}
+
+.navigator-btn:hover .navigator-btn-inside {
+    cursor: pointer;
+}
+
+.navigator-expanded-disabled {
+    position: absolute;
+    width: 3rem;
+    height: 3rem;
+    background-color: transparent;
+    right: 0.5rem;
+    top: 0.5rem;
+    overflow: hidden;
+
+    border-radius: 100%;
+
+    transition: transform;
+    transition-duration: 0.5s;
+    z-index: 9;
+
+    background-color: var(--bs-info);
+}
+
+
+.navigator-expanded-enabled {
+    transform: scale(80);
+}
+
+.disabled {
+    display: none !important;
+}
+
+.level-menu {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    padding: 0 5rem;
+    overflow-x: hidden;
+}
+
+.level-menu h1 {
+    font-weight: bold;
+}
+
+.img-container {
+    width: 100%;
+    height: 10rem;
+    overflow: hidden;
+    align-items: center;
+}
+
+.img-container img {
+    object-fit: cover;
+}
+
+.level-menu button {
+    width: 50%;
+}
+
+.level-menu h1 {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+.level-menu-row {
+    overflow-y: scroll;
+}
+
+.smallAnim {
+    animation-name: scaleAnim;
+    animation-duration: 0.5s;
+    animation-timing-function: ease-out;
+}
+
+@keyframes scaleAnim {
+    0% {
+        transform: translate(50%, -100%);
+    }
+    100% {
+        transform: translate(0, 0);
+    }
+}
