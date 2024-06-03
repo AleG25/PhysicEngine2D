@@ -301,7 +301,7 @@ function mainLoop() {
             const gravityForce = gravitationalConstant * b.mass * body.mass / distance.mult(10**5).magnitude()**2
             const gravityForceVector = distance.unit().mult(-1).mult(gravityForce)
 
-            if(ffvec.checked) gravityForceVector.drawVector(b.pos.x, b.pos.y, 40/b.r, "purple", "Fa")
+            if(ffvec.checked) gravityForceVector.drawVector(b.pos.x, b.pos.y, 40/b.r, "red", "Fa")
             
             
             totalGravityForce = totalGravityForce.add(gravityForceVector)
@@ -455,5 +455,5 @@ document.getElementById("btn-start").onclick = () => {
 
 setInterval(() => {
     trajectory.push({x: PB.pos.x, y: PB.pos.y})
-    if(trajectory.length > 50) trajectory.shift()
+    if(trajectory.length > 70) trajectory.shift()
 }, 100)

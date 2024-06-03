@@ -4,7 +4,7 @@ const ctx = canvas.getContext("2d")
 
 let elasticity = 1
 let friction = 0
-let acceleration = 0.1
+let acceleration = 3
 
 let maxGrab = 300
 
@@ -246,6 +246,7 @@ const isHover = e => e.parentElement.querySelector(':hover') === e;
 let isHovered = false;
 
 
+const trajectory = []
 
 // MAIN LOOP
 function mainLoop() {
@@ -270,7 +271,7 @@ function mainLoop() {
             const gravityForce = gravitationalConstant * b.mass * body.mass / distance.mult(10**5).magnitude()**2
             const gravityForceVector = distance.unit().mult(-1).mult(gravityForce)
 
-            if(ffvec.checked) gravityForceVector.drawVector(b.pos.x, b.pos.y, 40/b.r, "purple", "Fa")
+            if(ffvec.checked) gravityForceVector.drawVector(b.pos.x, b.pos.y, 40/b.r, "red", "Fa")
             
             
             totalGravityForce = totalGravityForce.add(gravityForceVector)
@@ -282,6 +283,12 @@ function mainLoop() {
         
         b.calcPos()
         b.displayVectors()
+    })
+    trajectory.forEach((t) => {
+        ctx.beginPath()
+        ctx.fillStyle = "blue"
+        ctx.arc(t.x, t.y, 2, 0, 2 * Math.PI)
+        ctx.fill()
     })
     if(isHovered && !isHover(canvas)) {
         isHovered = false
@@ -404,3 +411,9 @@ let firstLoad = true
 document.getElementById("btn-reset-sim").onclick = () => {
     location.reload()
 }
+
+
+setInterval(() => {
+    trajectory.push({x: PB.pos.x, y: PB.pos.y})
+    if(trajectory.length > 70) trajectory.shift()
+}, 100)

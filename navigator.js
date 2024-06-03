@@ -36,19 +36,19 @@ const levels = [
         level: 1
     },
     {
-        thumbnail: "thumbnails/level1.png",
+        thumbnail: "thumbnails/level2.png",
         name: "Simple Collision",
         link: "level2.html",
         level: 2
     },
     {
-        thumbnail: "thumbnails/level1.png",
+        thumbnail: "thumbnails/level3.png",
         name: "Gravity",
         link: "level3.html",
         level: 3
     },
     {
-        thumbnail: "thumbnails/level1.png",
+        thumbnail: "thumbnails/level4.png",
         name: "Orbit",
         link: "level4.html",
         level: 4
@@ -60,7 +60,7 @@ const level_row = document.getElementById("level-menu-row")
 levels.forEach((obj) => {
     const lc_copy = level_column.cloneNode(true)
     lc_copy.id = "level" + obj.level
-    lc_copy.querySelector("img").href = obj.thumbnail
+    lc_copy.querySelector("img").src = obj.thumbnail
     lc_copy.querySelector("h1").innerText = obj.level + "- " + obj.name
     lc_copy.querySelector("button").onclick = () => {
         location.assign(obj.link)
